@@ -11,6 +11,19 @@ def get_db():
     conn.execute("PRAGMA foreign_keys = ON")
     return conn
 
+def create_user(name, email, password_hash):
+    """Creates a new user. Returns True on success, False if email exists."""
+    try:
+        with get_db() as conn:
+            conn.execute(
+                "INSERT INTO users (name, email, password_hash) VALUES (?, ?, ?)",
+                (name, email, password_hash)
+            )
+            conn.commit()
+            return True
+    except sqlite3.IntegrityError:
+        return False
+
 def init_db():
     """Creates all tables using CREATE TABLE IF NOT EXISTS."""
     with get_db() as conn:
