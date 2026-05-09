@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from database.db import init_db, seed_db, create_user
 
 app = Flask(__name__)
+app.secret_key = "dev-secret-key-for-spendly"
 
 with app.app_context():
     init_db()
@@ -23,18 +24,28 @@ def register():
         name = request.form.get("name")
         email = request.form.get("email")
         password = request.form.get("password")
+        confirm_password = request.form.get("confirm_password")
 
-        if not all([name, email, password]):
-            return render_template("register.html", error="All fields are required.")
+        if not all([name, email, password, confirm_password]):
+            flash("All fields are required.", "danger")
+            return render_template("register.html")
 
-        from werkzeug.security import generate_password_hash
-        hashed_pw = generate_password_hash(password)
+        if password != confirm_password:
+            flash("Passwords do not match.", "danger")
+            return render_template("register.html")
 
-        if create_user(name, email, hashed_pw):
+        try:
+            create_user(name, email, password)
             flash("Your account has been created. You can now sign in.", "success")
             return redirect(url_for("login"))
-        else:
-            return render_template("register.html", error="Email already registered.")
+        except Exception as e:
+            # Specifically handling IntegrityError would be better, but we check the error type from db.py
+            import sqlite3
+            if isinstance(e, sqlite3.IntegrityError):
+                flash("Email already registered.", "danger")
+            else:
+                flash(f"An unexpected error occurred: {e}", "danger")
+            return render_template("register.html")
 
     return render_template("register.html")
 
