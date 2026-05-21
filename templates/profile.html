@@ -1,0 +1,274 @@
+{% extends "base.html" %}
+
+{% block title %}My Profile — Spendly{% endblock %}
+
+{% block content %}
+<style>
+    .profile-container {
+        max-width: var(--max-width);
+        margin: 3rem auto;
+        padding: 0 2rem;
+        display: grid;
+        grid-template-columns: 320px 1fr;
+        gap: 2.5rem;
+    }
+
+    /* Sidebar / User Card */
+    .profile-sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .user-card {
+        background: var(--paper-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 2rem;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+    }
+
+    .avatar {
+        width: 80px;
+        height: 80px;
+        background: var(--accent);
+        color: var(--paper);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        font-weight: 600;
+        margin: 0 auto 1.25rem;
+    }
+
+    .user-name {
+        font-family: var(--font-display);
+        font-size: 1.5rem;
+        color: var(--ink);
+        margin-bottom: 0.5rem;
+    }
+
+    .user-email {
+        font-size: 0.9rem;
+        color: var(--ink-muted);
+        margin-bottom: 1.5rem;
+    }
+
+    .user-meta {
+        font-size: 0.75rem;
+        color: var(--ink-faint);
+        border-top: 1px solid var(--border-soft);
+        padding-top: 1rem;
+    }
+
+    /* Main Content */
+    .profile-main {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.25rem;
+    }
+
+    .stat-card {
+        background: var(--paper-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        padding: 1.5rem;
+    }
+
+    .stat-label {
+        font-size: 0.8rem;
+        color: var(--ink-muted);
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-weight: 600;
+    }
+
+    .stat-value {
+        font-family: var(--font-display);
+        font-size: 1.75rem;
+        color: var(--ink);
+    }
+
+    /* Table Section */
+    .section-card {
+        background: var(--paper-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+    }
+
+    .section-title {
+        font-family: var(--font-display);
+        font-size: 1.25rem;
+        color: var(--ink);
+        margin-bottom: 1.5rem;
+    }
+
+    .transaction-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+    }
+
+    .transaction-table th {
+        text-align: left;
+        color: var(--ink-muted);
+        font-weight: 500;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid var(--border);
+        font-size: 0.8rem;
+        text-transform: uppercase;
+    }
+
+    .transaction-table td {
+        padding: 1rem 0;
+        border-bottom: 1px solid var(--border-soft);
+        color: var(--ink-soft);
+    }
+
+    .cat-badge {
+        padding: 0.2rem 0.6rem;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        background: var(--accent-light);
+        color: var(--accent);
+    }
+
+    /* Categories Breakdown */
+    .cat-breakdown {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+    }
+
+    .cat-row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .cat-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .cat-name {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: var(--ink-soft);
+    }
+
+    .cat-bar-container {
+        width: 150px;
+        height: 8px;
+        background: var(--border-soft);
+        border-radius: 999px;
+        overflow: hidden;
+    }
+
+    .cat-bar-fill {
+        height: 100%;
+        background: var(--accent);
+        border-radius: 999px;
+    }
+
+    .cat-amount {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--ink);
+        min-width: 80px;
+        text-align: right;
+    }
+
+    @media (max-width: 900px) {
+        .profile-container {
+            grid-template-columns: 1fr;
+        }
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="profile-container">
+    <aside class="profile-sidebar">
+        <div class="user-card">
+            <div class="avatar">{{ user.name[0] }}</div>
+            <div class="user-name">{{ user.name }}</div>
+            <div class="user-email">{{ user.email }}</div>
+            <div class="user-meta">Member since {{ user.member_since }}</div>
+        </div>
+    </aside>
+
+    <main class="profile-main">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Spent</div>
+                <div class="stat-value">{{ stats.total_spent }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Transactions</div>
+                <div class="stat-value">{{ stats.transaction_count }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Top Category</div>
+                <div class="stat-value">{{ stats.top_category }}</div>
+            </div>
+        </div>
+
+        <div class="section-card">
+            <h2 class="section-title">Recent Transactions</h2>
+            <table class="transaction-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Description</th>
+                        <th>Category</th>
+                        <th style="text-align: right;">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tx in transactions %}
+                    <tr>
+                        <td>{{ tx.date }}</td>
+                        <td>{{ tx.description }}</td>
+                        <td><span class="cat-badge">{{ tx.category }}</span></td>
+                        <td style="text-align: right; font-weight: 600;">{{ tx.amount }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section-card">
+            <h2 class="section-title">Category Breakdown</h2>
+            <div class="cat-breakdown">
+                {% for cat in categories %}
+                <div class="cat-row">
+                    <div class="cat-info">
+                        <span class="cat-name">{{ cat.name }}</span>
+                        <div class="cat-bar-container">
+                            <div class="cat-bar-fill" style="width: {{ cat.percentage }}%;"></div>
+                        </div>
+                    </div>
+                    <div class="cat-amount">{{ cat.amount }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
